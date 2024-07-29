@@ -1,27 +1,39 @@
 const sharp = require('sharp');
-const redirect = require('./redirect');
+const cache = require('./cache');
 
-function compress(req, res, input) {
-  const format = req.params.webp ? 'webp' : 'jpeg';
+async function proxy(req, res) {
+  try {
+    const { url, webp, grayscale, quality } = req.params;
+    const cacheKey = `${url}-${webp}-${grayscale}-${quality}`;
 
-  sharp(input)
-    .grayscale(req.params.grayscale)
-    .toFormat(format, {
-      quality: req.params.quality,
-      progressive: true,
-      optimizeScans: true
-    })
-    .toBuffer((err, output, info) => {
-      if (err || !info || res.headersSent) {
-        return redirect(req, res);
-      }
+    // Check if image is cached
+    const cachedImage = await cache.get(cacheKey);
+    if (cachedImage) {
+      return res.send(cachedImage);
+    }
 
-      res.setHeader('content-type', `image/${format}`);
-      res.setHeader('content-length', info.size);
-      res.setHeader('x-original-size', req.params.originSize);
-      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-      res.status(200).send(output);
-    });
+    // Process image using sharp
+    const image = await sharp(url)
+      .grayscale(grayscale)
+      .toFormat(webp ? 'webp' : 'jpeg', { quality })
+      .toBuffer();
+
+    const originalSize = await sharp(url).toBuffer().length;
+    const compressedSize = image.length;
+
+    if (compressedSize >= originalSize) {
+      throw new Error('Image compression failed');
+    }
+
+    // Cache the processed image
+    await cache.set(cacheKey, image);
+
+    res.send(image);
+  } catch (error) {
+    console.error(error);
+    // Send the original image if processing fails
+    res.send(await sharp(req.params.url).toBuffer());
+  }
 }
 
-module.exports = compress;
+module.exports = proxy;
