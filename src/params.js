@@ -1,11 +1,11 @@
 const DEFAULT_QUALITY = 40; // Default quality value
-const URL = require('url'); // Import the URL module
+const URL = require('url');
 
 function params(req, res, next) {
   const { url, jpeg, bw, l } = req.query;
 
-  if (!url) {
-    return res.end('bandwidth-hero-proxy');
+  if (!url || typeof url !== 'string') {
+    return res.end('Error: Invalid URL');
   }
 
   const urls = Array.isArray(url) ? url.join('&url=') : url;
