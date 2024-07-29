@@ -5,7 +5,7 @@ function params(req, res, next) {
   const { url, jpeg, bw, l } = req.query;
 
   if (!url || typeof url !== 'string') {
-    return res.end('Ebandwidth-hero-proxy');
+    return res.end('bandwidth-hero-proxy');
   }
 
   const urls = Array.isArray(url) ? url.join('&url=') : url;
