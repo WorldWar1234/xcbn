@@ -7,7 +7,7 @@ async function proxy(req, res) {
 
     // Check if image should be compressed
     if (!shouldCompress(req)) {
-      return res.send(await sharp(url).toBuffer());
+      return res.send(await sharp(url).toBuffer()); // Send original image
     }
 
     // Process image using sharp
@@ -20,13 +20,14 @@ async function proxy(req, res) {
     const compressedSize = image.length;
 
     if (compressedSize >= originalSize) {
-      throw new Error('Image compression failed');
+      return res.send(await sharp(url).toBuffer()); // Send original image if compression doesn't reduce size
     }
 
     res.send(image);
   } catch (error) {
     console.error('Error processing image:', error);
-    res.status(500).send(`Error processing image: ${error.message}`);
+    // Send the original image if processing fails
+    res.send(await sharp(req.params.url).toBuffer());
   }
 }
 
