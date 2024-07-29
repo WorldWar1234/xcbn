@@ -1,9 +1,14 @@
 const DEFAULT_QUALITY = 40; // Default quality value
 
 function params(req, res, next) {
-  const url = req.url;
-  const cleanedUrl = url.replace(/^\/+|\/+$/g, '');
-  const [l, w, bw, jpeg] = cleanedUrl.split('/');
+  const { url, jpeg, bw, l } = req.query;
+
+  if (!url) {
+    return res.end('bandwidth-hero-proxy');
+  }
+
+  const urls = Array.isArray(url) ? url.join('&url=') : url;
+  const cleanedUrl = urls.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://');
 
   req.params = {
     url: cleanedUrl,
