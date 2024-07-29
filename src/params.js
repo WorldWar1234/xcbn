@@ -5,7 +5,7 @@ function params(req, res, next) {
   const { url, jpeg, bw, l } = req.query;
 
   if (!url || typeof url !== 'string') {
-    return res.end('Error: Invalid URL');
+    return res.end('Ebandwidth-hero-proxy');
   }
 
   const urls = Array.isArray(url) ? url.join('&url=') : url;
