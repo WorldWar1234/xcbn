@@ -1,4 +1,5 @@
 const DEFAULT_QUALITY = 40; // Default quality value
+const URL = require('url'); // Import the URL module
 
 function params(req, res, next) {
   const { url, jpeg, bw, l } = req.query;
@@ -10,8 +11,8 @@ function params(req, res, next) {
   const urls = Array.isArray(url) ? url.join('&url=') : url;
   const cleanedUrl = urls.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://');
 
-  if (!cleanedUrl) {
-    return res.end('Error: No URL provided');
+  if (!cleanedUrl || !URL.parse(cleanedUrl).hostname) {
+    return res.end('Error: Invalid URL provided');
   }
 
   req.params = {
