@@ -10,6 +10,10 @@ function params(req, res, next) {
   const urls = Array.isArray(url) ? url.join('&url=') : url;
   const cleanedUrl = urls.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://');
 
+  if (!cleanedUrl) {
+    return res.end('Error: No URL provided');
+  }
+
   req.params = {
     url: cleanedUrl,
     webp: !jpeg,
