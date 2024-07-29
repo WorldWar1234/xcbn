@@ -1,22 +1,13 @@
 const sharp = require('sharp');
-const cache = require('./cache');
 const shouldCompress = require('./shouldCompress');
 
 async function proxy(req, res) {
   try {
-    console.log('Request params:', req.params);
     const { url, webp, grayscale, quality } = req.params;
-    const cacheKey = `${url}-${webp}-${grayscale}-${quality}`;
 
     // Check if image should be compressed
     if (!shouldCompress(req)) {
       return res.send(await sharp(url).toBuffer());
-    }
-
-    // Check if image is cached
-    const cachedImage = await cache.get(cacheKey);
-    if (cachedImage) {
-      return res.send(cachedImage);
     }
 
     // Process image using sharp
@@ -31,9 +22,6 @@ async function proxy(req, res) {
     if (compressedSize >= originalSize) {
       throw new Error('Image compression failed');
     }
-
-    // Cache the processed image
-    await cache.set(cacheKey, image);
 
     res.send(image);
   } catch (error) {
