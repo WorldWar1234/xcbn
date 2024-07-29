@@ -1,4 +1,4 @@
-const DEFAULT_QUALITY = 40;
+const DEFAULT_QUALITY = 40; // Default quality value
 
 function params(req, res, next) {
   const url = req.url;
