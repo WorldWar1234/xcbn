@@ -4,6 +4,7 @@ const shouldCompress = require('./shouldCompress');
 
 async function proxy(req, res) {
   try {
+    console.log('Request params:', req.params);
     const { url, webp, grayscale, quality } = req.params;
     const cacheKey = `${url}-${webp}-${grayscale}-${quality}`;
 
@@ -36,8 +37,7 @@ async function proxy(req, res) {
 
     res.send(image);
   } catch (error) {
-    console.error(error);
-    // Send the original image if processing fails
+    console.error('Error processing image:', error);
     res.status(500).send(`Error processing image: ${error.message}`);
   }
 }
