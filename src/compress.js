@@ -38,7 +38,7 @@ async function proxy(req, res) {
   } catch (error) {
     console.error(error);
     // Send the original image if processing fails
-    res.send(await sharp(req.params.url).toBuffer());
+    res.status(500).send(`Error processing image: ${error.message}`);
   }
 }
 
