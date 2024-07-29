@@ -7,6 +7,8 @@ function proxy(req, res) {
   const originType = req.headers['content-type'] || ''
   const originSize = buffer.length
 
+  res.setHeader('content-encoding', 'identity')
+
   if (shouldCompress(req)) {
     compress(req, res, buffer)
   } else {
