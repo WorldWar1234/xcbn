@@ -1,10 +1,16 @@
 const sharp = require('sharp');
 const cache = require('./cache');
+const shouldCompress = require('./shouldCompress');
 
 async function proxy(req, res) {
   try {
     const { url, webp, grayscale, quality } = req.params;
     const cacheKey = `${url}-${webp}-${grayscale}-${quality}`;
+
+    // Check if image should be compressed
+    if (!shouldCompress(req)) {
+      return res.send(await sharp(url).toBuffer());
+    }
 
     // Check if image is cached
     const cachedImage = await cache.get(cacheKey);
